@@ -1,22 +1,30 @@
 const request = require('request');
-let userInput = process.argv.slice(2);
-let search = userInput[0];
+
+//let search = userInput[0];
 //console.log("Check____________", search);
 
+const fetchBreedDescription = function(breedName, callback) {
+  const url = `https://api.thecatapi.com/v1/breeds/search?q=${breedName}`;
 
-request(`https://api.thecatapi.com/v1/breeds/search?q=${search}`, function(error, response, body) {
+  request(url, (error, response, body) =>  {
+  //console.log(body)
+    if (error) {
+      return callback(error, null);
+    }
+    
+    const desc = JSON.parse(body);
+    //console.log(desc)
+    const breedObject = desc[0];
+    //console.log(breed)
+    if (breedObject) {
+      callback(null, breedObject.description);
+    } else {
+      callback("no breed found");
+    }
+    
+  });
 
-  if (error) {
-    return console.error('_____Request FAILED', error); // Print the error if one occurred
-  //console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  }
-  
-  const data = JSON.parse(body);
-  if (data.length === 0) {
-    console.log("your cat has not been found");
+};
 
-  } else {
-    console.log('data:', data[0].description); // Print the HTML for the URL input.
-  //console.log(data);
-  }
-});
+//console.log(fetchBreedDescription());
+module.exports = { fetchBreedDescription };
